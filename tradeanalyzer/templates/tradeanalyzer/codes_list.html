@@ -1,0 +1,122 @@
+{% load static %}
+<html>
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
+<title>Code List</title>
+<body onload=onLoad()>
+<script type="text/javascript">
+function onLoad() {
+    var x = document.getElementById("search-form");
+    x.elements[0].value= "{{ search_type }}";
+    x.elements[1].value= "{{ keyword }}";
+}
+</script>
+<div id="title">
+<h1>Code List</h1>
+</div>
+<br>
+<div id="search">
+<form id="search-form">
+    Type : <select name="search_type">
+               <option value="2">code</option>
+               <option value="1">name</option>
+               <option value="0">none</option>
+           </select>
+    Key word : <input type="text" value="1" name="key_word">
+    <button onclick="search_code()">Search</button>
+</form>
+<script type="text/javascript">
+function search_code() {
+}
+</script>
+</div>
+<div id="content">
+    {% if codes_list %}
+        <table class="table table-bordered" style="align:center">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>code</th>
+                <th>company</th>
+                <th>last_update</th>
+                <th>full_code</th>
+                <th>market type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for code in codes_list %}
+                <tr>
+                <td>{{code.id}}</td>
+                <td><a href="{{ code.get_absolute_url }}/trade/history/{{ code.code  }}">{{ code.code }}</a></td>
+                <td>{{code.company}}</td>
+                <td>{{code.last_update}}</td>
+                <td>{{code.full_code}}</td>
+                <td>{{code.market_type}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    {% else %}
+    <br>
+    <br>
+    No Data.
+    <br>
+    <br>
+    {% endif %}       
+</div>
+
+<div id="page">
+{# Pagination #}
+{% if is_paginated %}
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <table class="table table-bordered" style="align: center"> <tbody> <tr>
+        <td>
+            <a href="?page=1&search_type={{ search_type }}&key_word={{ keyword }}" aria-label="first">First</a>
+        <td>
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&search_type={{ search_type }}&key_word={{ keyword }}" aria-label="previous">
+                <span aria-hidden="true">&laquo;</span> </a>
+        {% endif %}
+        </td>
+
+        {% for page in page_range %}
+            <td> <a href="?page={{ page }}&search_type={{ search_type }}&key_word={{ keyword }} ">{{ page }}</a> </td>
+        {% endfor %}
+
+        <td>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&search_type={{ search_type }}&key_word={{ keyword }}" aria-label="Next">&raquo;</a>
+        {% endif %}
+        </td>
+        <td>
+            <a href="?page={{ page_obj.paginator.num_pages }}&search_type={{ search_type }}&key_word={{ keyword }}" aria-label="Last">Last</a>
+        </td>
+
+        </tr> </tbody> </table>
+    </ul>
+</nav>
+{% endif %}
+<form id="goto-form">
+    Page : <input type="text" value="1" name="page">
+    <input type="hidden" value="{{ search_type }}" name="search_type">
+    <input type="hidden" value="{{ keyword }}" name="key_word">
+    <button onclick="goto_page()">Goto</button>
+</form>
+<script type="text/javascript">
+    function goto_page() { 
+        var x = document.getElementById("goto-form");
+        var page = x.elements[0].value;
+        var num_page = parseInt(page);
+        var max_page = parseInt({{ page_obj.paginator.num_pages }});
+        if (parseInt(num_page) >= parseInt(max_page) ) {
+            page = String(max_page);
+        } else if ( parseInt(num_page) <= 0 ) {
+            page = String(1);
+        }
+        x.elements[0].value = page;
+    }
+</script>
+</div>
+{% include "tradeanalyzer/html_tail.html" %}
+</body>
+</html>

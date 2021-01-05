@@ -1,0 +1,23 @@
+<form id="datepicker">
+    Year  : <select name="year" id="year" value="{{ now_year }}">
+            {% for year in year_list %}
+                <option value="{{ year }}"
+                {% if year == now_year %}selected="selected"{% endif %}
+                >{{ year }}</option>
+            {% endfor %}
+            </select>
+    Month : <select name="month" id="month" value="{{ now_month }}">
+            {% for month in month_list %}
+                <option value="{{ month }}"
+                {% if month == now_month %}selected="selected"{% endif %}
+                >{{ month }}</option>
+            {% endfor %}
+            </select>
+    Day   : <select name="day" id="day" value="{{ now_day }}">
+            {% for day in day_list %} 
+                <option values="{{ day }}"
+                {% if day == now_day %}selected="selected"{% endif %}
+                >{{ day }}</option>
+            {% endfor %}
+            </select>
+</form>

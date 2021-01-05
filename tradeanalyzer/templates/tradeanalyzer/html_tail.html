@@ -1,0 +1,17 @@
+<hr>
+<table align="center">
+<tbody>
+<tr>
+    {% if return_url %}
+    <td> <a href={{ return_url }}>Back</a> </td>
+    <td> | </td>
+    {% endif %}
+    <td> <a href={{ get_absolute_url }}"/trade/codes/">Company List</a> </td>
+    <td> | </td>
+    <td> <a href={{ get_absolute_url }}"/trade/">Trade Home</a> </td>
+    <td> | </td>
+    <td> <a href={{ get_absolute_url }}"/admin/">Admin</a> </td>
+</tr>
+</tbody>
+</table>
+<p align="center"> Copyright 2019 Simpson </p>

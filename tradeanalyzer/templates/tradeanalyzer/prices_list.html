@@ -1,0 +1,260 @@
+<html>  
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css"
+      href="/media/css/site-examples.css?_=8ffc0b31bc8d9ff82fbb94689dd1d7ff">
+<link rel="stylesheet" type="text/css"
+      href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css"
+      href="https://cdn.datatables.net/select/1.3.0/css/select.dataTables.min.css">
+<link rel="stylesheet" type="text/css"
+      href="https://cdn.datatables.net/buttons/1.5.6/css/button.dataTables.min.css">
+<link rel="stylesheet" type="text/css"
+      href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css">
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'tradeanalyzer/style.css' %}">
+<title> Prices List </title>
+<style type="text/css" class="init">
+    #events {
+        margin-bottom: 1em;
+        padding: 1em;
+        background-color: #f6f6f6;
+        border: 1px solid #999;
+        border-radius: 3px;
+        height: 100px;
+        overflow: auto;
+    }
+    input input[type=submit], input[type=reset] {
+        background-color: #4CAF50;
+        border: 2px;
+        color: white;
+        padding: 16px 32px;
+        text-decoration: none;
+        margin: 4px 2px;
+        cursor: pointer;
+    }
+    input[type=button] {
+        background-color: #4CAF50;
+        border: 0px;
+        color: black;
+        padding: 8px 16px;
+        text-decoration: none;
+        margin: 2px 1px;
+        cursor: pointer;
+    }
+
+    button
+</style>
+<script src="http://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript" language="javascript"
+        src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js">
+</script>
+<script type="text/javascript" language="javascript"
+        src="https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js">
+</script>
+<script type="text/javascript" language="javascript"
+        src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js">
+</script>
+<script type="text/javascript" class="init">
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+function submit2(company_code, dataList) {
+    var dataListJSON = JSON.stringify(dataList);
+    var x = document.getElementById("data_del");
+    x.elements[1].value= dataListJSON;
+    //alert('submit2 10');
+    //alert('submit2 ' + x.elements[1].value);
+    //alert('submit2 ' + x.elements[2].value);
+    x.submit();
+}
+
+window.onload = function(){
+}
+
+var editor;
+
+$(document).ready(function(){
+    var events = $('#events');
+    var events1 = new Array();
+    var csrftoken = getCookie('csrftoken');
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+    var table = $('#price_list').DataTable( {
+        processing: true,
+        //serverSide: true,
+        //dom: 'Bfrtip',
+        dom: 'ACBlf<"clear">rtip',
+        bJQueryUI: true,
+        columnDefs: [ {
+            orderable: false,
+            className: 'select-checkbox',
+            targets:   0
+        } ],
+        select: {
+            style:    'multi',
+            selector: 'td:first-child'
+        },
+        "oLanguage": {
+            sEmptyTable: "There are no Project Statuses By Type at this time",
+            sProcessing: "Processing, Please Wait...",
+        },
+        order: [[ 1, 'asc' ]],
+        buttons: [
+            {
+                text: 'Delete',
+                action: function () {
+                    var selected = table.rows( { selected: true } ).data().toArray();
+                    submit2({{ company_code }}, selected);
+                }
+            },
+            {
+                text: 'Select all',
+                action: function () {
+                    table.rows().select();
+                }
+            },
+            {
+                text: 'Select none',
+                action: function () {
+                    table.rows().deselect();
+                }
+            }
+        ],
+        columns: [
+            { "data": "sel" },
+            { "data": "price_date" },
+            { "data": "price_open" },
+            { "data": "price_cloe" },
+            { "data": "price_high" },
+            { "data": "price_low" },
+            { "data": "volume" }
+        ]
+    } );
+
+    var data = table.$('input, select textarea').serializeArray();
+
+    table
+        .on( 'select', function ( e, dt, type, indexes ) {
+            //var rowData = table.rows( indexes ).data().toArray();
+            //events.prepend('<div><b>'+type+' selection</b>-'+JSON.stringify( rowData )+'</div>');
+        } )
+        .on( 'deselect', function ( e, dt, type, indexes ) {
+            //var rowData = table.rows( indexes ).data().toArray();
+            //events.prepend('<div><b>'+type+'<i>de</i>selection</b>-'+JSON.stringify(rowData )+'</div>');
+        } );
+});
+</script>
+</head>
+<body>
+<h1>{{ company_code }}'s Prices</h1>
+
+<div id="price_data" class="table-container">
+{% if prices_list %}
+    <hr>
+    {% csrf_token %}
+    <table id="price_list" class="display" style="align:center width:100%">
+    <thead class="thead-table-list"><tr>
+        <th></th>
+        <th scope="col">price_date</th>
+        <th scope="col">price_open</th>
+        <th scope="col">price_close</th>
+        <th scope="col">price_high</th>
+        <th scope="col">price_low</th>
+        <th scope="col">volume</th>
+    </tr></thead>
+    <tbody>
+        {% for price in prices_list %}
+            <tr>
+                <td></td>
+                <td>{{ price.price_date|date:"Y-m-d" }}</td>
+                <td>{{ price.price_open }}</td>
+                <td>{{ price.price_close }}</td>
+                <td>{{ price.price_high }}</td>
+                <td>{{ price.price_low }}</td>
+                <td>{{ price.volume }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th></th>
+            <th>price_date</th>
+            <th>price_open</th>
+            <th>price_close</th>
+            <th>price_high</th>
+            <th>price_low</th>
+            <th>volume</th>
+        </tr>
+    </tfoot>
+    </table>
+
+{% else %}
+  <p>There are no price in the list.</p>
+{% endif %}       
+{% csrf_token %}
+</div>
+<hr/>
+<br><br>
+
+<div id='analyzee' class=linkcol>
+{% block bar %}
+{% include "tradeanalyzer/date_picker.html" %}
+{% include "tradeanalyzer/date_picker.js" %}
+{% endblock %}
+
+<table><tbody><tr><td>
+<form action="/trade/analyze" id="execute_form" method="POST" class=linkcol>
+    <input type="hidden" id="ana_company_code" name="company_code" value="{{ company_code }}">
+    <input type="hidden" id="ana_return_url"   name="return_url"   value="{{ request.get_full_path }}">
+    {% include "tradeanalyzer/common_date_field.html" %}
+    <button onclick="update_date(this.form)" class=button1>Analyze</button>
+    {% csrf_token %}
+</form>
+</td><td>
+<div id='data_new' class=linkcol>
+    <form action="/trade/historyget" id="get_new_data" method="GET" class=linkcol>
+        <input type="hidden" id="get_company_code" name="company_code" value="{{ company_code }}">
+        {% include "tradeanalyzer/common_date_field.html" %}
+        <button onclick="update_date(this.form)" class=button1>Get New Data</button>
+    </form>
+</div>
+</td></tr></tbody></table>
+
+<div id="data_control">
+    <form action="/trade/historydelete" id="data_del" method="POST">
+        <input type="hidden" name="company_code" value="{{ company_code }}">
+        <input type="hidden" name="price_list" value="">
+        {% include "tradeanalyzer/common_date_field.html" %}
+        {% csrf_token %}
+    </form>
+</div>
+<p align="center">
+{% include "tradeanalyzer/html_tail.html" %}
+</p>
+</body>
+</html>

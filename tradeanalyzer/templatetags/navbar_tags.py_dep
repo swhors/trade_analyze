@@ -1,0 +1,37 @@
+from django import template
+
+from ..models import MenuItem
+
+register = template.Library()
+
+
+@register.tag
+def navbar_menu(parser, token):
+    template_name = 'menu.html'
+
+    # 입력 받은 토큰을 분리한다.
+    tokens = token.split_contents()
+    num = len(tokens)
+
+    if num not in [2, 3]:
+        raise template.TemplateSyntaxError('%r tag requires two arguments.' % tokens[0])
+
+    tree_query_set = MenuItem.objects.filter(menu__title=tokens[1][1:-1])
+
+    if num == 3:
+        template_name = tokens[2][1:-1]
+
+    return Menu(tree_query_set, template_name)
+
+
+class Menu(template.Node):
+    def __init__(self, tree_query_set, template_name):
+        self.tree_query_set = tree_query_set
+        self.template_name = template_name
+
+    def render(self, context):
+        t = context.template.engine.get_template(self.template_name)
+        return t.render(
+            template.Context({
+                'tree_menu': self.tree_query_set
+            }, autoescape=context.autoescape))

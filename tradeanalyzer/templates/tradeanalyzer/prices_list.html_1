@@ -1,0 +1,80 @@
+{% load static %}
+<html>  
+<head>
+<link rel="stylesheet" type="text/css" href="{% static 'tradeanalyzer/style.css' %}">
+<title> Prices List </title>
+</head>
+<body>
+<h1>Price History : {{ company_code }}</h1>
+
+<div id="price_data">
+{% if prices_list %}
+    <table class="table table-bordered" style="align:center">
+    <thead><tr>
+        <th>id</th>
+        <th>code</th>
+        <th>last_update</th>
+        <th>price_data</th>
+        <th>price_open</th>
+        <th>price_close</th>
+        <th>price_high</th>
+        <th>price_low</th>
+        <th>price_adj_close</th>
+        <th>volume</th>
+    </tr></thead>
+    <tbody>
+        {% for price in prices_list %}
+            <tr>
+                <td>{{ price.id }}</td>
+                <td>{{ price.code }}</td>
+                <td>{{ price.last_update }}</td>
+                <td>{{ price.price_date }}</td>
+                <td>{{ price.price_open }}</td>
+                <td>{{ price.price_close }}</td>
+                <td>{{ price.price_high }}</td>
+                <td>{{ price.price_low }}</td>
+                <td>{{ price.price_adj_close }}</td>
+                <td>{{ price.volume }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+
+    <form action="/trade/analyze" id="execute_form" method="POST">
+        {% csrf_token %}
+        <input type=j"hidden" name="company_code" value="{{ company_code }}">
+        <button onclick="execute_analyze()">Execute Analyze</button>
+    </form>
+    <script type="text/javascript">
+        function execute_analyze() {
+        }
+</script>
+{% else %}
+  <p>There are no price in the list.</p>
+{% endif %}       
+</div>
+<hr/>
+<div id='data_new'>
+<form id="price_data_due">
+    Year  : <select name="year" id="year" >
+            {% for year in year_list %}
+                <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+            </select>
+    Month : <select name="month" id="month" >
+            {% for month in month_list %}
+                <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+            </select>
+    Day   : <select name="day" id="day">
+            {% for day in day_list %} 
+                <option values="{{ day }}">{{ day }}</option>
+            {% endfor %}
+            </select>
+</form>
+<form action="/trade/historyget" id="get_new_data" method="GET">
+    <input type="hidden" name="company_code" value="{{ company_code }}">
+    <button>Get New Data</button>
+</div>
+</body>
+</html>

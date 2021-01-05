@@ -1,0 +1,25 @@
+<html>
+<head>
+<title>
+</title>
+</head>
+<body>
+<h1>Analyze : {{ company_code }} </h1>
+<br>
+<hr>
+<br>
+<Information>
+    <form>
+        <p>Company Name : <Input type="text" name="company_name" value="" readonly ></p>
+        <p>End Date : <input type="text" name="end_date" value="{{ end_date }}" readonly=true ></p>
+    </form>
+</Information>
+
+<H4>Select : </H4>
+<form>
+    <p>Mean : <input type='radio' name="calculate_mean" value="1"></p>
+    <p>STD  : <input type='radio' name="calculate_std" value="2"></p>
+</form>
+{% include "tradeanalyzer/html_tail.html" %}
+</body>
+</html>
